@@ -1,5 +1,10 @@
 [package]
 
-name = "semver"
+name = "fourcc"
 version = "0.0.1"
 authors = ["The Rust Project Developers"]
+
+[[lib]]
+
+name = "fourcc"
+plugin = true
