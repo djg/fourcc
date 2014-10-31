@@ -134,16 +134,16 @@ fn parse_tts(cx: &ExtCtxt,
              tts: &[ast::TokenTree]) -> (P<ast::Expr>, Option<Ident>) {
     let p = &mut cx.new_parser_from_tts(tts);
     let ex = p.parse_expr();
-    let id = if p.token == token::EOF {
+    let id = if p.token == token::Eof {
         None
     } else {
-        p.expect(&token::COMMA);
+        p.expect(&token::Comma);
         let lo = p.span.lo;
         let ident = p.parse_ident();
         let hi = p.last_span.hi;
         Some(Ident{ident: ident, span: mk_sp(lo, hi)})
     };
-    if p.token != token::EOF {
+    if p.token != token::Eof {
         p.unexpected();
     }
     (ex, id)
