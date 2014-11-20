@@ -10,9 +10,9 @@ A Rust syntax extension to generate FourCCs.
 Add this to your `Cargo.toml`:
 
 ```toml
-[dependencies.fourcc]
+[dependencies]
 
-git = "https://github.com/rust-lang/fourcc"
+fourcc = "*"
 ```
 
 and this to your crate root:
