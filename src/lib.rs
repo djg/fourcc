@@ -36,10 +36,6 @@
 //!
 //! * [Wikipedia: FourCC](http://en.wikipedia.org/wiki/FourCC)
 
-#![crate_name = "fourcc"]
-#![experimental]
-#![crate_type = "rlib"]
-#![crate_type = "dylib"]
 #![doc(html_logo_url = "http://www.rust-lang.org/logos/rust-logo-128x128-blk-v2.png",
        html_favicon_url = "http://www.rust-lang.org/favicon.ico")]
 
@@ -86,7 +82,7 @@ pub fn expand_syntax_ext(cx: &mut ExtCtxt, sp: Span, tts: &[ast::TokenTree])
         ast::ExprLit(ref lit) => match lit.node {
             // string literal
             ast::LitStr(ref s, _) => {
-                if s.get().char_len() != 4 {
+                if s.get().chars().count() != 4 {
                     cx.span_err(expr.span, "string literal with len != 4 in fourcc!");
                 }
                 s
