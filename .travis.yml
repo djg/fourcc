@@ -1,7 +1,7 @@
-install:
-  - curl https://static.rust-lang.org/rustup.sh | sudo sh -
+language: rust
 script:
   - cargo build --verbose
   - cargo test --verbose
-env:
-  - LD_LIBRARY_PATH=/usr/local/lib
+notifications:
+  email:
+    on_success: never
