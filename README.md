@@ -18,6 +18,6 @@ fourcc = "*"
 and this to your crate root:
 
 ```rust
-#[phase(plugin)]
-extern crate fourcc;
+#![feature(plugin)]
+#![plugin(fourcc)]
 ```
