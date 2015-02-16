@@ -54,6 +54,7 @@ use syntax::parse::token;
 use syntax::parse::token::InternedString;
 use syntax::ptr::P;
 use rustc::plugin::Registry;
+use std::ops::Deref;
 
 #[plugin_registrar]
 pub fn plugin_registrar(reg: &mut Registry) {
@@ -66,7 +67,7 @@ pub fn expand_syntax_ext(cx: &mut ExtCtxt, sp: Span, tts: &[ast::TokenTree])
 
     let little = match endian {
         None => false,
-        Some(Ident{ident, span}) => match token::get_ident(ident).get() {
+        Some(Ident{ident, span}) => match token::get_ident(ident).deref() {
             "little" => true,
             "big" => false,
             "target" => target_endian_little(cx, sp),
@@ -82,7 +83,7 @@ pub fn expand_syntax_ext(cx: &mut ExtCtxt, sp: Span, tts: &[ast::TokenTree])
         ast::ExprLit(ref lit) => match lit.node {
             // string literal
             ast::LitStr(ref s, _) => {
-                if s.get().chars().count() != 4 {
+                if s.deref().chars().count() != 4 {
                     cx.span_err(expr.span, "string literal with len != 4 in fourcc!");
                 }
                 s
@@ -99,7 +100,7 @@ pub fn expand_syntax_ext(cx: &mut ExtCtxt, sp: Span, tts: &[ast::TokenTree])
     };
 
     let mut val = 0u32;
-    for codepoint in s.get().chars().take(4) {
+    for codepoint in s.deref().chars().take(4) {
         let byte = if codepoint as u32 > 0xFF {
             cx.span_err(expr.span, "fourcc! literal character out of range 0-255");
             0u8
