@@ -48,7 +48,7 @@ use syntax::ast;
 use syntax::attr::contains;
 use syntax::codemap::{Span, mk_sp};
 use syntax::ext::base;
-use syntax::ext::base::{ExtCtxt, MacExpr};
+use syntax::ext::base::{ExtCtxt, MacEager};
 use syntax::ext::build::AstBuilder;
 use syntax::parse::token;
 use syntax::parse::token::InternedString;
@@ -115,7 +115,7 @@ pub fn expand_syntax_ext(cx: &mut ExtCtxt, sp: Span, tts: &[ast::TokenTree])
         };
     }
     let e = cx.expr_lit(sp, ast::LitInt(val as u64, ast::UnsignedIntLit(ast::TyU32)));
-    MacExpr::new(e)
+    MacEager::expr(e)
 }
 
 struct Ident {
