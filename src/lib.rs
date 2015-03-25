@@ -39,7 +39,7 @@
 #![doc(html_logo_url = "http://www.rust-lang.org/logos/rust-logo-128x128-blk-v2.png",
        html_favicon_url = "http://www.rust-lang.org/favicon.ico")]
 
-#![feature(plugin_registrar)]
+#![feature(plugin_registrar, rustc_private)]
 
 extern crate syntax;
 extern crate rustc;
@@ -145,7 +145,7 @@ fn parse_tts(cx: &ExtCtxt,
 fn target_endian_little(cx: &ExtCtxt, sp: Span) -> bool {
     let meta = cx.meta_name_value(sp, InternedString::new("target_endian"),
         ast::LitStr(InternedString::new("little"), ast::CookedStr));
-    contains(cx.cfg().as_slice(), &*meta)
+    contains(&cx.cfg(), &*meta)
 }
 
 // FIXME (10872): This is required to prevent an LLVM assert on Windows
