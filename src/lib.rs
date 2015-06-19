@@ -134,7 +134,7 @@ fn parse_tts(cx: &ExtCtxt,
         let lo = p.span.lo;
         let ident = p.parse_ident();
         let hi = p.last_span.hi;
-        Some(Ident{ident: ident, span: mk_sp(lo, hi)})
+        Some(Ident{ident: ident.unwrap(), span: mk_sp(lo, hi)})
     };
     if p.token != token::Eof {
         p.unexpected();
