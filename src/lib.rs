@@ -67,7 +67,7 @@ pub fn expand_syntax_ext(cx: &mut ExtCtxt, sp: Span, tts: &[ast::TokenTree])
 
     let little = match endian {
         None => false,
-        Some(Ident{ident, span}) => match token::get_ident(ident).deref() {
+        Some(Ident{ident, span}) => match &*ident.name.as_str() {
             "little" => true,
             "big" => false,
             "target" => target_endian_little(cx, sp),
