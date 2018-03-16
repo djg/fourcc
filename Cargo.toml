@@ -1,18 +1,20 @@
 [package]
 
 name = "fourcc"
-version = "0.0.4"
+version = "0.1.0"
 authors = ["The Rust Project Developers"]
 
+readme = "README.md"
 license = "MIT/Apache-2.0"
 repository = "https://github.com/rust-lang/fourcc"
 homepage = "https://github.com/rust-lang/fourcc"
-keywords = ["plugin", "macro"]
+keywords = ["macro","fourcc"]
 description = """
-Syntax extension to generate FourCCs (four-character code).
+A macro to generate FourCCs (four-character code).
 """
 
-[lib]
+[dependencies]
+fourcc-impl = { version = "0.1", path = "./fourcc-impl" }
+proc-macro-hack = "0.4"
 
-name = "fourcc"
-plugin = true
+[workspace]
