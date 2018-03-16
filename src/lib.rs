@@ -21,7 +21,7 @@
 //! To load the extension and use it:
 //!
 //! ```rust,ignore
-//! #[phase(plugin)]
+//! #[macro_use]
 //! extern crate fourcc;
 //!
 //! fn main() {
@@ -39,115 +39,16 @@
 #![doc(html_logo_url = "http://www.rust-lang.org/logos/rust-logo-128x128-blk-v2.png",
        html_favicon_url = "http://www.rust-lang.org/favicon.ico")]
 
-#![feature(plugin_registrar, rustc_private)]
+#[macro_use]
+extern crate proc_macro_hack;
 
-extern crate syntax;
-extern crate rustc;
+#[allow(unused_imports)]
+#[macro_use]
+extern crate fourcc_impl;
 
-use syntax::ast;
-use syntax::attr::contains;
-use syntax::codemap::{Span, mk_sp};
-use syntax::ext::base;
-use syntax::ext::base::{ExtCtxt, MacEager};
-use syntax::ext::build::AstBuilder;
-use syntax::parse::token;
-use syntax::parse::token::InternedString;
-use syntax::ptr::P;
-use rustc::plugin::Registry;
-use std::ops::Deref;
+#[doc(hidden)]
+pub use fourcc_impl::*;
 
-#[plugin_registrar]
-pub fn plugin_registrar(reg: &mut Registry) {
-    reg.register_macro("fourcc", expand_syntax_ext);
+proc_macro_expr_decl! {
+    fourcc! => fourcc_impl
 }
-
-pub fn expand_syntax_ext(cx: &mut ExtCtxt, sp: Span, tts: &[ast::TokenTree])
-                         -> Box<base::MacResult + 'static> {
-    let (expr, endian) = parse_tts(cx, tts);
-
-    let little = match endian {
-        None => false,
-        Some(Ident{ident, span}) => match &*ident.name.as_str() {
-            "little" => true,
-            "big" => false,
-            "target" => target_endian_little(cx, sp),
-            _ => {
-                cx.span_err(span, "invalid endian directive in fourcc!");
-                target_endian_little(cx, sp)
-            }
-        }
-    };
-
-    let s = match expr.node {
-        // expression is a literal
-        ast::ExprLit(ref lit) => match lit.node {
-            // string literal
-            ast::LitStr(ref s, _) => {
-                if s.deref().chars().count() != 4 {
-                    cx.span_err(expr.span, "string literal with len != 4 in fourcc!");
-                }
-                s
-            }
-            _ => {
-                cx.span_err(expr.span, "unsupported literal in fourcc!");
-                return base::DummyResult::expr(sp)
-            }
-        },
-        _ => {
-            cx.span_err(expr.span, "non-literal in fourcc!");
-            return base::DummyResult::expr(sp)
-        }
-    };
-
-    let mut val = 0u32;
-    for codepoint in s.deref().chars().take(4) {
-        let byte = if codepoint as u32 > 0xFF {
-            cx.span_err(expr.span, "fourcc! literal character out of range 0-255");
-            0u8
-        } else {
-            codepoint as u8
-        };
-
-        val = if little {
-            (val >> 8) | ((byte as u32) << 24)
-        } else {
-            (val << 8) | (byte as u32)
-        };
-    }
-    let e = cx.expr_lit(sp, ast::LitInt(val as u64, ast::UnsignedIntLit(ast::TyU32)));
-    MacEager::expr(e)
-}
-
-struct Ident {
-    ident: ast::Ident,
-    span: Span
-}
-
-fn parse_tts(cx: &ExtCtxt,
-             tts: &[ast::TokenTree]) -> (P<ast::Expr>, Option<Ident>) {
-    let p = &mut cx.new_parser_from_tts(tts);
-    let ex = p.parse_expr();
-    let id = if p.token == token::Eof {
-        None
-    } else {
-        p.expect(&token::Comma);
-        let lo = p.span.lo;
-        let ident = p.parse_ident();
-        let hi = p.last_span.hi;
-        Some(Ident{ident: ident.unwrap(), span: mk_sp(lo, hi)})
-    };
-    if p.token != token::Eof {
-        p.unexpected();
-    }
-    (ex, id)
-}
-
-fn target_endian_little(cx: &ExtCtxt, sp: Span) -> bool {
-    let meta = cx.meta_name_value(sp, InternedString::new("target_endian"),
-        ast::LitStr(InternedString::new("little"), ast::CookedStr));
-    contains(&cx.cfg(), &*meta)
-}
-
-// FIXME (10872): This is required to prevent an LLVM assert on Windows
-#[test]
-fn dummy_test() { }
