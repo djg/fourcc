@@ -1,21 +1,3 @@
-# Example
-
-```rust
-#[macro_use]
-extern crate fourcc;
-
-fn main() {
-    assert_eq!(fourcc!("asys"), 0x61737973);
-    assert_eq!(fourcc!("asys", big), 0x61737973);
-    assert_eq!(fourcc!("asys", little), 0x73797361);
-
-    if cfg!(target_endian = "big") {
-        assert_eq!(fourcc!("asys", target), 0x61737973);
-    } else {
-        assert_eq!(fourcc!("asys", target), 0x73797361);
-    }
-```
-
 fourcc
 ======
 
@@ -38,6 +20,24 @@ comma-separated keyword following the string literal. Keyword is one of:
  * `target` - Endian of target.
 
 The default ordering is `big` endian.
+
+# Example
+
+```rust
+#[macro_use]
+extern crate fourcc;
+
+fn main() {
+    assert_eq!(fourcc!("asys"), 0x61737973);
+    assert_eq!(fourcc!("asys", big), 0x61737973);
+    assert_eq!(fourcc!("asys", little), 0x73797361);
+
+    if cfg!(target_endian = "big") {
+        assert_eq!(fourcc!("asys", target), 0x61737973);
+    } else {
+        assert_eq!(fourcc!("asys", target), 0x73797361);
+    }
+```
 
 # Usage
 
